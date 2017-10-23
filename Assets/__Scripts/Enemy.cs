@@ -12,7 +12,6 @@ public class Enemy : MonoBehaviour
 
     public Bounds bounds; // The Bounds of this and its children
     public Vector3 boundsCenterOffset; // Dist of bounds.center from position
-
     void Awake()
     {
         InvokeRepeating("CheckOffscreen", 0f, 2f);
