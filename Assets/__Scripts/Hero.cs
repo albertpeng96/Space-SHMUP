@@ -10,7 +10,8 @@ public class Hero : MonoBehaviour {
     public float            pitchMult = 30;
 
     // Ship status information
-    public float            shieldLevel = 1;
+    [SerializeField]
+    private float _shieldLevel = 1;            // Add the underscore!
 
     public bool ____________________________;
 
@@ -49,6 +50,9 @@ public class Hero : MonoBehaviour {
         transform.rotation = Quaternion.Euler(yAxis*pitchMult,xAxis*rollMult,0);
     }
 
+    // This variable holds a reference to the last triggering GameObject
+    public GameObject lastTriggerGo = null;                                // 1
+
     void OnTriggerEnter(Collider other)
     {
         // Find the tag of other.gameObject or its parent GameObjects
@@ -56,14 +60,49 @@ public class Hero : MonoBehaviour {
         // If there is a parent with a tag
         if (go != null)
         {
-            // Announce it
-            print("Triggered: " + go.name);
+            // Make sure it's not the same triggering go as last time
+            if (go == lastTriggerGo)
+            {                                      // 2
+                return;
+            }
+            lastTriggerGo = go;
+
+            if (go.tag == "Enemy")
+            {
+                // If the shield was triggered by an enemy
+                // Decrease the level of the shield by 1
+                shieldLevel--;
+                // Destroy the enemy
+                Destroy(go);                                                // 4
+            }
+            else
+            {
+                print("Triggered: " + go.name);            // Move this line here!
+            }
         }
         else
         {
             // Otherwise announce the original other.gameObject
             print("Triggered: " + other.gameObject.name); // Move this line here!
         }
+        }
+
+    public float shieldLevel
+    {
+        get
+        {
+            return (_shieldLevel);                                 // 1
+        }
+        set
+        {
+            _shieldLevel = Mathf.Min(value, 4);                   // 2
+            // If the shield is going to be set to less than zero
+            if (value < 0)
+            {                                        // 3
+                Destroy(this.gameObject);
+            }
+        }
     }
 }
+
 
