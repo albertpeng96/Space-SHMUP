@@ -33,8 +33,12 @@ public class Hero : MonoBehaviour {
         
         S = this;  // Set the Singleton
         bounds = Utils.CombineBoundsOfChildren(this.gameObject);
+    }
 
-       
+    void Start()
+    {
+        ClearWeapons();
+        weapons[0].SetType(WeaponType.blaster);
     }
 
     void Update () {
