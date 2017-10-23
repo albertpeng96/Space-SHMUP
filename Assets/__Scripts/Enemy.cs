@@ -8,12 +8,24 @@ public class Enemy : MonoBehaviour
     public float health = 10;
     public int score = 100; // Points earned for destroying this
 
+    public int showDamageForFrames = 2; // # frames to show damage
+
     public bool ________________;
+
+    public Color[] originalColors;
+    public Material[] materials;// All the Materials of this & its children
+    public int remainingDamageFrames = 0; // Damage frames left
 
     public Bounds bounds; // The Bounds of this and its children
     public Vector3 boundsCenterOffset; // Dist of bounds.center from position
     void Awake()
     {
+        materials = Utils.GetAllMaterials(gameObject);
+        originalColors = new Color[materials.Length];
+        for (int i = 0; i < materials.Length; i++)
+        {
+            originalColors[i] = materials[i].color;
+        }
         InvokeRepeating("CheckOffscreen", 0f, 2f);
     }
 
@@ -21,6 +33,14 @@ public class Enemy : MonoBehaviour
     void Update()
     {
         Move();
+        if (remainingDamageFrames > 0)
+        {
+            remainingDamageFrames--;
+            if (remainingDamageFrames == 0)
+            {
+                UnShowDamage();
+            }
+        }
     }
 
     public virtual void Move()
@@ -85,6 +105,7 @@ public class Enemy : MonoBehaviour
                     break;
                 }
                 // Hurt this Enemy
+                ShowDamage();
                 // Get the damage amount from the Projectile.type & Main.W_DEFS
                 health -= Main.W_DEFS[p.type].damageOnHit;
                 if (health <= 0)
@@ -94,6 +115,22 @@ public class Enemy : MonoBehaviour
                 }
                 Destroy(other);
                 break;
+        }
+    }
+
+    void ShowDamage()
+    {
+        foreach (Material m in materials)
+        {
+            m.color = Color.red;
+        }
+        remainingDamageFrames = showDamageForFrames;
+    }
+    void UnShowDamage()
+    {
+        for (int i = 0; i < materials.Length; i++)
+        {
+            materials[i].color = originalColors[i];
         }
     }
 }
